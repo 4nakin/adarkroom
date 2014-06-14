@@ -39,8 +39,11 @@ var Space = {
 		
 		// Create the hull display
 		var h = $('<div>').attr('id', 'hullRemaining').appendTo(this.panel);
-		$('<div>').addClass('row_key').text('hull: ').appendTo(h);
+		$('<div>').addClass('row_key').text(_('hull: ')).appendTo(h);
 		$('<div>').addClass('row_val').appendTo(h);
+		
+		//subscribe to stateUpdates
+		$.Dispatch('stateUpdate').subscribe(Space.handleStateUpdates);
 	},
 	
 	options: {}, // Nothing for now
@@ -70,24 +73,24 @@ var Space = {
 		if(Engine.activeModule == this) {
 			var t;
 			if(Space.altitude < 10) {
-				t = "Troposphere";
+				t = _("Troposphere");
 			} else if(Space.altitude < 20) {
-				t = "Stratosphere";
+				t = _("Stratosphere");
 			} else if(Space.altitude < 30) {
-				t = "Mesosphere";
+				t = _("Mesosphere");
 			} else if(Space.altitude < 45) {
-				t = "Thermosphere";
+				t = _("Thermosphere");
 			} else if(Space.altitude < 60){
-				t = "Exosphere";
+				t = _("Exosphere");
 			} else {
-				t = "Space";
+				t = _("Space");
 			}
 			document.title = t;
 		}
 	},
 	
 	getSpeed: function() {
-		return Space.SHIP_SPEED + State.ship.thrusters;
+		return Space.SHIP_SPEED + $SM.get('game.spaceShip.thrusters');
 	},
 	
 	updateHull: function() {
@@ -100,7 +103,7 @@ var Space = {
 		if(r < 0.2)
 			c = '#';
 		else if(r < 0.4)
-			c = '$'
+			c = '$';
 		else if(r < 0.6)
 			c = '%';
 		else if(r < 0.8)
@@ -109,7 +112,7 @@ var Space = {
 			c = 'H';
 		
 		var x = Math.floor(Math.random() * 700);
-		var a = $('<div>').addClass('asteroid').text(c).appendTo('#spacePanel').css('left', x + 'px')
+		var a = $('<div>').addClass('asteroid').text(c).appendTo('#spacePanel').css('left', x + 'px');
 		a.data({
 			xMin: x,
 			xMax: x + a.width(),
@@ -216,15 +219,24 @@ var Space = {
 		
 		Space.ship.css({
 			left: x + 'px',
-			top: y + 'px',
+			top: y + 'px'
 		});
 		
 		Space.lastMove = Date.now();
 	},
 	
 	startAscent: function() {
-		$('body').addClass('noMask').css({backgroundColor: '#FFFFFF'}).animate({
-			backgroundColor: '#000000'
+		if (Engine.isLightsOff()) {
+			var body_color = '#272823';
+			var to_color = '#EEEEEE';
+		}
+		else {
+			var body_color = '#FFFFFF';
+			var to_color = '#000000';
+		}
+
+		$('body').addClass('noMask').css({backgroundColor: body_color}).animate({
+			backgroundColor: to_color
 		}, {
 			duration: Space.FTB_SPEED, 
 			easing: 'linear',
@@ -247,8 +259,11 @@ var Space = {
 			}
 		}, 1000);
 		
-		setTimeout(function() {
-			$('#spacePanel, .deleteSave, .share').animate({color: 'white'}, 500, 'linear');
+		Space._panelTimeout = setTimeout(function() {
+			if (Engine.isLightsOff())
+				$('#spacePanel, .menu, select.menuBtn').animate({color: '#272823'}, 500, 'linear');
+			else
+				$('#spacePanel, .menu, select.menuBtn').animate({color: 'white'}, 500, 'linear');
 		}, Space.FTB_SPEED / 2);
 		
 		Space.createAsteroid();
@@ -308,10 +323,14 @@ var Space = {
 		Space.done = true;
 		clearInterval(Space._timer);
 		clearInterval(Space._shipTimer);
-		
+		clearTimeout(Space._panelTimeout);
+		if (Engine.isLightsOff())
+			var body_color = '#272823';
+		else
+			var body_color = '#FFFFFF';
 		// Craaaaash!
 		$('body').removeClass('noMask').stop().animate({
-			backgroundColor: '#FFFFFF'
+			backgroundColor: body_color
 		}, {
 			duration: 300, 
 			progress: function() {
@@ -325,9 +344,12 @@ var Space = {
 				Space.starsBack.remove();
 				Space.stars = Space.starsBack = null;
 				$('#starsContainer').remove();
+				$('body').attr('style', '');
+				$('#notifyGradient').attr('style', '');	
+				$('#spacePanel').attr('style', '');			
 			}
 		});
-		$('#spacePanel, .deleteSave, .share').animate({color: 'black'}, 300, 'linear');
+		$('.menu, select.menuBtn').animate({color: '#666'}, 300, 'linear');
 		$('#outerSlider').animate({top: '0px'}, 300, 'linear');
 		Engine.activeModule = Ship;
 		Ship.onArrival();
@@ -369,9 +391,14 @@ var Space = {
 					$('#locationSlider, #worldPanel, #spacePanel, #notifications').remove();
 					$('#header').empty();
 					setTimeout(function() {
-						$('body').removeClass('noMask').stop().animate({
+						$('body').stop();
+						if (Engine.isLightsOff())
+							var container_color = '#EEE';
+						else
+							var container_color = '#000';
+						$('#starsContainer').animate({
 							opacity: 0,
-							'background-color': '#FFF'
+							'background-color': container_color
 						}, {
 							duration: 2000, 
 							progress: function() {
@@ -381,18 +408,40 @@ var Space = {
 								$('#notifyGradient').attr('style', 'background-color:'+cur+';background:-webkit-' + s + ';background:' + s);
 							},
 							complete: function() {
-								$('#starsContainer, .deleteSave, .share').remove();
-								if(typeof Storage != 'undefined' && localStorage) {
-									localStorage.clear();
-								}
-								delete window.State;
-								Engine.options = {};
-								setTimeout(function() {
-									Engine.init();
-									$('body').animate({
-										opacity: 1
-									}, 500, 'linear');
-								}, 2000);
+								Engine.GAME_OVER = true;
+
+				                Score.save();
+				                Prestige.save();
+				                
+				                $('<center>')
+				                	.addClass('centerCont')
+			                		.appendTo('body');
+				                $('<span>')
+				                	.addClass('endGame')
+			                		.text(_('score for this game: {0}', Score.calculateScore()))
+			                		.appendTo('.centerCont')
+			                		.animate({opacity:1},1500);
+				                $('<br />')
+				                	.appendTo('.centerCont');
+				                $('<span>')
+				                	.addClass('endGame')
+			                		.text(_('total score: {0}', Prestige.get().score))
+			                		.appendTo('.centerCont')
+			                		.animate({opacity:1},1500);
+				                $('<br />')
+				                	.appendTo('.centerCont');
+				                $('<br />')
+				                	.appendTo('.centerCont');
+				                $('#starsContainer').remove();
+					    		$('#content, #notifications').remove();
+					    		$('<span>')
+				                	.addClass('endGame endGameRestart')
+				                	.text(_('restart.'))
+				                	.click(Engine.confirmDelete)
+				                	.appendTo('.centerCont')
+				                	.animate({opacity:1},1500);
+					    		Engine.options = {};
+				                Engine.deleteSave(true);
 							}
 						});
 					}, 2000);
@@ -449,5 +498,9 @@ var Space = {
 				Engine.log('right off');
 				break;
 		}
+	},
+	
+	handleStateUpdates: function(e){
+		
 	}
 };

@@ -4,7 +4,7 @@
 Events.Encounters = [
 	/* Tier 1 */
 	{ /* Snarling Beast */
-		title: 'A Snarling Beast',
+		title: _('A Snarling Beast'),
  		isAvailable: function() {
  			return World.getDistance() <= 10 && World.getTerrain() == World.TILE.FOREST;
  		},
@@ -12,7 +12,9 @@ Events.Encounters = [
  			'start': {
  				combat: true,
  				enemy: 'snarling beast',
- 				char: 'B',
+  				enemyName: _('snarling beast'),
+ 				deathMessage: _('the snarling beast is dead'),
+ 				chara: 'B',
  				damage: 1,
  				hit: 0.8,
  				attackDelay: 1,
@@ -34,12 +36,12 @@ Events.Encounters = [
  						chance: 0.8
  					}
  				},
- 				notification: 'a snarling beast leaps out of the underbrush'
+ 				notification: _('a snarling beast leaps out of the underbrush')
  			}
  		}
 	},
 	{ /* Gaunt Man */
-     	title: 'A Gaunt Man',
+     	title: _('A Gaunt Man'),
   		isAvailable: function() {
   			return World.getDistance() <= 10 && World.getTerrain() == World.TILE.BARRENS;
   		},
@@ -47,7 +49,9 @@ Events.Encounters = [
   			'start': {
   				combat: true,
   				enemy: 'gaunt man',
-  				char: 'G',
+  				enemyName: _('gaunt man'),
+ 				deathMessage: _('the gaunt man is dead'),
+  				chara: 'G',
   				damage: 2,
   				hit: 0.8,
   				attackDelay: 2,
@@ -69,20 +73,22 @@ Events.Encounters = [
   						chance: 0.5
   					}
   				},
-  				notification: 'a gaunt man approaches, a crazed look in his eye'
+  				notification: _('a gaunt man approaches, a crazed look in his eye')
   			}
 		}
   	},
 	{ /* Strange Bird */
-     	title: 'A Strange Bird',
+     	title: _('A Strange Bird'),
   		isAvailable: function() {
   			return World.getDistance() <= 10 && World.getTerrain() == World.TILE.FIELD;
   		},
   		scenes: {
   			'start': {
   				combat: true,
-  				enemy: 'strange bird',
-  				char: 'B',
+  				enemy: 'strange bird',  				
+  				enemyName: _('strange bird'),  				
+  				deathMessage: _('the strange bird is dead'),
+  				chara: 'B',
   				damage: 3,
   				hit: 0.8,
   				attackDelay: 2,
@@ -104,21 +110,65 @@ Events.Encounters = [
   						chance: 0.8
   					}
   				},
-  				notification: 'a strange looking bird speeds across the plains'
+  				notification: _('a strange looking bird speeds across the plains')
   			}
 		}
   	},
 	/* Tier 2*/
+	{ /* Shivering Man */
+     	title: _('A Shivering Man'),
+  		isAvailable: function() {
+  			return World.getDistance() > 10 && World.getDistance() <= 20 && World.getTerrain() == World.TILE.BARRENS;
+  		},
+  		scenes: {
+  			'start': {
+  				combat: true,
+  				enemy: 'shivering man', 
+  				enemyName: _('shivering man'), 
+  				deathMessage: _('the shivering man is dead'),
+  				chara: 'S',
+  				damage: 5,
+  				hit: 0.5,
+  				attackDelay: 1,
+  				health: 20,
+  				loot: {
+  					'cloth': {
+  						min: 1,
+  						max: 1,
+  						chance: 0.2
+  					},
+  					'teeth': {
+  						min: 1,
+  						max: 2,
+  						chance: 0.8
+  					},
+  					'leather': {
+  						min: 1,
+  						max: 1,
+  						chance: 0.2
+  					},
+  					'medicine': {
+  					  min: 1,
+  					  max: 3,
+  					  chance: 0.7
+  					}
+  				},
+  				notification: _('a shivering man approaches and attacks with surprising strength')
+  			}
+		}
+  },
 	{ /* Man-eater */
-		title: 'A Man-Eater',
+		title: _('A Man-Eater'),
  		isAvailable: function() {
  			return World.getDistance() > 10 && World.getDistance() <= 20 && World.getTerrain() == World.TILE.FOREST;
  		},
  		scenes: {
  			'start': {
  				combat: true,
- 				enemy: 'man-eater',
- 				char: 'E',
+ 				enemy: 'man-eater', 
+ 				enemyName: _('man-eater'), 
+ 				deathMessage: _('the man-eater is dead'),
+ 				chara: 'E',
  				damage: 3,
  				hit: 0.8,
  				attackDelay: 1,
@@ -140,20 +190,22 @@ Events.Encounters = [
  						chance: 0.8
  					}
  				},
- 				notification: 'a large creature attacks, claws freshly bloodied'
+ 				notification: _('a large creature attacks, claws freshly bloodied')
  			}
  		}
 	},
 	{ /* Scavenger */
-     	title: 'A Scavenger',
+     	title: _('A Scavenger'),
   		isAvailable: function() {
   			return World.getDistance() > 10 && World.getDistance() <= 20 && World.getTerrain() == World.TILE.BARRENS;
   		},
   		scenes: {
   			'start': {
   				combat: true,
-  				enemy: 'scavenger',
-  				char: 'S',
+  				enemy: 'scavenger', 
+  				enemyName: _('scavenger'), 
+  				deathMessage: _('the scavenger is dead'),
+  				chara: 'S',
   				damage: 4,
   				hit: 0.8,
   				attackDelay: 2,
@@ -169,26 +221,33 @@ Events.Encounters = [
   						max: 10,
   						chance: 0.8
   					},
-					'iron': {
-						min: 1,
-						max: 5,
-						chance: 0.5
-					}
+  					'iron': {
+  						min: 1,
+  						max: 5,
+  						chance: 0.5
+  					},
+  					'medicine': {
+  					  min: 1,
+  					  max: 2,
+  					  chance: 0.1
+  					}
   				},
-  				notification: 'a scavenger draws close, hoping for an easy score'
+  				notification: _('a scavenger draws close, hoping for an easy score')
   			}
 		}
   	},
 	{ /* Huge Lizard */
-     	title: 'A Huge Lizard',
+     	title: _('A Huge Lizard'),
   		isAvailable: function() {
   			return World.getDistance() > 10 && World.getDistance() <= 20 && World.getTerrain() == World.TILE.FIELD;
   		},
   		scenes: {
   			'start': {
   				combat: true,
-  				enemy: 'lizard',
-  				char: 'L',
+  				enemy: 'lizard', 
+  				enemyName: _('lizard'), 
+  				deathMessage: _('the lizard is dead'),
+  				chara: 'L',
   				damage: 5,
   				hit: 0.8,
   				attackDelay: 2,
@@ -210,21 +269,23 @@ Events.Encounters = [
   						chance: 0.8
   					}
   				},
-  				notification: 'the grass thrashes wildly as a huge lizard pushes through'
+  				notification: _('the grass thrashes wildly as a huge lizard pushes through')
   			}
 		}
   	},
 	/* Tier 3*/
 	{ /* Feral Terror */
-		title: 'A Feral Terror',
+		title: _('A Feral Terror'),
  		isAvailable: function() {
  			return World.getDistance() > 20 && World.getTerrain() == World.TILE.FOREST;
  		},
  		scenes: {
  			'start': {
  				combat: true,
- 				enemy: 'feral terror',
- 				char: 'F',
+ 				enemy: 'feral terror', 
+ 				enemyName: _('feral terror'), 
+ 				deathMessage: _('the feral terror is dead'),
+ 				chara: 'F',
  				damage: 6,
  				hit: 0.8,
  				attackDelay: 1,
@@ -246,21 +307,23 @@ Events.Encounters = [
  						chance: 0.8
  					}
  				},
- 				notification: 'a beast, wilder than imagining, erupts out of the foliage'
+ 				notification: _('a beast, wilder than imagining, erupts out of the foliage')
  			}
  		}
 	},
 	{ /* Soldier */
-     	title: 'A Soldier',
+     	title: _('A Soldier'),
   		isAvailable: function() {
   			return World.getDistance() > 20 && World.getTerrain() == World.TILE.BARRENS;
   		},
   		scenes: {
   			'start': {
   				combat: true,
-  				enemy: 'soldier',
+  				enemy: 'soldier', 
+  				enemyName: _('soldier'), 
+  				deathMessage: _('the soldier is dead'),
 				ranged: true,
-  				char: 'D',
+  				chara: 'D',
   				damage: 8,
   				hit: 0.8,
   				attackDelay: 2,
@@ -271,31 +334,38 @@ Events.Encounters = [
   						max: 10,
   						chance: 0.8
   					},
-					'bullets': {
-						min: 1,
-						max: 5,
-						chance: 0.5
-					},
-					'rifle': {
-						min: 1,
-						max: 1,
-						chance: 0.2
-					}
+  					'bullets': {
+  						min: 1,
+  						max: 5,
+  						chance: 0.5
+  					},
+  					'rifle': {
+  						min: 1,
+  						max: 1,
+  						chance: 0.2
+  					},
+  					'medicine': {
+  					  min: 1,
+  					  max: 2,
+  					  chance: 0.1
+  					}
   				},
-  				notification: 'a soldier opens fire from across the desert'
+  				notification: _('a soldier opens fire from across the desert')
   			}
 		}
   	},
 	{ /* Sniper */
-     	title: 'A Sniper',
+     	title: _('A Sniper'),
   		isAvailable: function() {
   			return World.getDistance() > 20 && World.getTerrain() == World.TILE.FIELD;
   		},
   		scenes: {
   			'start': {
   				combat: true,
-  				enemy: 'sniper',
-  				char: 'S',
+  				enemy: 'sniper', 
+  				enemyName: _('sniper'), 
+  				deathMessage: _('the sniper is dead'),
+  				chara: 'S',
   				damage: 15,
   				hit: 0.8,
   				attackDelay: 4,
@@ -307,19 +377,24 @@ Events.Encounters = [
   						max: 10,
   						chance: 0.8
   					},
-					'bullets': {
-						min: 1,
-						max: 5,
-						chance: 0.5
-					},
-					'rifle': {
-						min: 1,
-						max: 1,
-						chance: 0.2
-					}
+  					'bullets': {
+  						min: 1,
+  						max: 5,
+  						chance: 0.5
+  					},
+  					'rifle': {
+  						min: 1,
+  						max: 1,
+  						chance: 0.2
+  					},
+  					'medicine': {
+  					  min: 1,
+  					  max: 2,
+  					  chance: 0.1
+  					}
   				},
-  				notification: 'a shot rings out, from somewhere in the long grass'
+  				notification: _('a shot rings out, from somewhere in the long grass')
   			}
 		}
-  	},
+  	}
 ];
